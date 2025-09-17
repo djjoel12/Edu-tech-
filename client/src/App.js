@@ -1,9 +1,9 @@
 // src/App.js
-
 import React from "react";
 import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 import HomePagePremium from "./components/HomePagePremium";
 import SchoolRegisterForm from "./components/SchoolRegisterForm";
+import DirectorSignup from "./components/DirectorSignup";
 
 function App() {
   return (
@@ -16,7 +16,10 @@ function App() {
             <Link to="/" className="hover:underline">
               Accueil
             </Link>
-            <Link to="/register" className="hover:underline">
+            <Link to="/signup-director" className="hover:underline">
+              Inscrire un directeur
+            </Link>
+            <Link to="/register-school" className="hover:underline">
               Inscrire une école
             </Link>
           </div>
@@ -25,7 +28,8 @@ function App() {
         {/* Routes */}
         <Routes>
           <Route path="/" element={<HomePagePremium />} />
-          <Route path="/register" element={<SchoolRegisterForm />} />
+          <Route path="/signup-director" element={<DirectorSignup />} />
+          <Route path="/register-school" element={<SchoolRegisterForm />} />
         </Routes>
       </div>
     </Router>
