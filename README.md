@@ -1,1 +1,4 @@
-# Edu-tech-
+# Edu-tech-       
+
+npm install @heroicons/react
+
