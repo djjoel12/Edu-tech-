@@ -61,7 +61,7 @@ const SchoolRegistrationForm = () => {
       setLoading(true);
 
       const response = await axios.post(
-        
+        "/api/register",
         submitData
       );
 
