@@ -35,7 +35,12 @@ const DirectorSignup = () => {
 
     try {
       setLoading(true);
-      const response = await axios.post("/api/auth/signup", formData);
+
+      // 🔑 URL complète du backend pour éviter les erreurs de port
+      const response = await axios.post(
+        "http://localhost:5000/api/auth/signup",
+        formData
+      );
 
       // Stocker le token JWT dans localStorage
       localStorage.setItem("token", response.data.token);

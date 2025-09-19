@@ -1,3 +1,4 @@
+// server.js
 import express from "express";
 import mongoose from "mongoose";
 import cors from "cors";
@@ -5,7 +6,9 @@ import dotenv from "dotenv";
 import path from "path";
 import fs from "fs";
 
+// ===== Import des routes =====
 import schoolRoutes from "./routes/schoolRoutes.js";
+import authRoutes from "./routes/authRoutes.js"; // ✅ ajout
 
 dotenv.config();
 
@@ -21,11 +24,12 @@ const uploadDir = path.join(process.cwd(), "uploads");
 if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir);
 
 // ===== Servir les fichiers statiques (logos) =====
-app.use('/uploads', express.static(uploadDir));
+app.use("/uploads", express.static(uploadDir));
 
 // ===== Routes =====
 app.get("/", (req, res) => res.send("SaaS École — API OK 🚀"));
 app.use("/api", schoolRoutes);
+app.use("/api/auth", authRoutes); // ✅ ajout de la route d’authentification
 
 // ===== Démarrage serveur + connexion MongoDB =====
 async function start() {
@@ -41,7 +45,7 @@ async function start() {
     }
 
     app.listen(PORT, "0.0.0.0", () =>
-      console.log(`Server is running on http://localhost:${PORT}`)
+      console.log(`🚀 Server is running on http://localhost:${PORT}`)
     );
   } catch (err) {
     console.error("❌ Erreur au démarrage :", err);
