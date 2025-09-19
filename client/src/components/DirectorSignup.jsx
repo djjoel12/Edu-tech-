@@ -36,10 +36,17 @@ const DirectorSignup = () => {
     try {
       setLoading(true);
 
-      // 🔑 URL complète du backend pour éviter les erreurs de port
+      // 🔹 Remplace localhost par l'URL publique de ton backend Replit
+      const BACKEND_URL = "https://1a3d0990-28d1-45f5-bf0c-9acee884f196-00-2xxj8pu3ho37v.picard.replit.dev";
+
       const response = await axios.post(
-        "http://localhost:5000/api/auth/signup",
-        formData
+        `${BACKEND_URL}/api/auth/signup`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
       );
 
       // Stocker le token JWT dans localStorage
@@ -50,6 +57,7 @@ const DirectorSignup = () => {
       // Reset form
       setFormData({ name: "", email: "", password: "" });
     } catch (error) {
+      console.error("Erreur signup:", error);
       const serverMsg =
         error.response?.data?.message ||
         error.message ||
