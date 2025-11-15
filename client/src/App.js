@@ -3,6 +3,8 @@ import React from "react";
 import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 import HomePage from "./components/HomePage";
 import CompanyRegisterForm from "./components/CompanyRegisterForm";
+import CompanyLogin from "./components/CompanyLogin"; // ← IMPORT AJOUTÉ
+import CompanyDashboard from './components/CompanyDashboard';
 
 function App() {
   return (
@@ -29,6 +31,12 @@ function App() {
                 Trouver un Ticket
               </Link>
               <Link 
+                to="/login-company" 
+                className="text-gray-700 hover:text-orange-600 font-medium transition-colors"
+              >
+                Connexion
+              </Link>
+              <Link 
                 to="/register-company" 
                 className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg font-medium transition-colors"
               >
@@ -42,10 +50,22 @@ function App() {
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/register-company" element={<CompanyRegisterForm />} />
+          <Route path="/login-company" element={<CompanyLogin />} />
+          <Route path="/company-dashboard" element={<CompanyDashboard />} /> {/* ← ROUTE AJOUTÉE */}
           <Route path="/find-ticket" element={
             <div className="container mx-auto p-8 text-center">
               <h2 className="text-2xl font-bold text-gray-900 mb-4">
                 Recherche de tickets - Bientôt disponible
+              </h2>
+              <p className="text-gray-600">
+                Cette fonctionnalité sera bientôt implémentée.
+              </p>
+            </div>
+          } />
+          <Route path="/company-dashboard" element={
+            <div className="container mx-auto p-8 text-center">
+              <h2 className="text-2xl font-bold text-gray-900 mb-4">
+                Tableau de bord compagnie - Bientôt disponible
               </h2>
               <p className="text-gray-600">
                 Cette fonctionnalité sera bientôt implémentée.

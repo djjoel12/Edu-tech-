@@ -47,6 +47,19 @@ const HomePage = () => {
               </button>
             </div>
 
+            {/* Lien de connexion pour les compagnies existantes */}
+            <div className="mt-6 text-center md:text-left">
+              <p className="text-gray-600 text-sm">
+                Déjà partenaire ?{' '}
+                <button 
+                  onClick={() => navigate('/login-company')}
+                  className="text-orange-600 hover:text-orange-700 font-semibold underline underline-offset-2 transition-colors"
+                >
+                  Connectez-vous ici
+                </button>
+              </p>
+            </div>
+
             {/* Statistiques avec une nouvelle typographie et couleurs */}
             <div className="flex flex-wrap gap-x-12 gap-y-4 mt-12 justify-center md:justify-start">
               <div>
@@ -119,6 +132,14 @@ const HomePage = () => {
               <p className="text-gray-600 leading-relaxed">
                 Digitalisez vos ventes, gérez votre flotte et vos départs. Accédez à des statistiques détaillées pour développer votre activité.
               </p>
+              <div className="mt-4">
+                <button 
+                  onClick={() => navigate('/login-company')}
+                  className="text-green-600 hover:text-green-700 font-medium text-sm underline underline-offset-2 transition-colors"
+                >
+                  Accéder à mon espace
+                </button>
+              </div>
             </div>
 
             {/* Carte Contrôleurs */}
@@ -130,6 +151,32 @@ const HomePage = () => {
               <p className="text-gray-600 leading-relaxed">
                 Validez les billets en un flash avec notre application mobile. Suivez le remplissage des véhicules en temps réel et sans erreur.
               </p>
+            </div>
+          </div>
+
+          {/* Section d'appel à l'action pour les compagnies */}
+          <div className="mt-20 text-center">
+            <div className="bg-gradient-to-r from-orange-50 to-green-50 rounded-2xl p-8 border border-orange-200">
+              <h3 className="text-2xl font-bold text-slate-900 mb-4">
+                Vous êtes une compagnie de transport ?
+              </h3>
+              <p className="text-gray-600 mb-6 max-w-2xl mx-auto">
+                Rejoignez notre plateforme et boostez votre activité avec nos outils de gestion modernes.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <button 
+                  onClick={() => navigate('/register-company')}
+                  className="bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 px-8 rounded-lg transition-colors"
+                >
+                  Créer un compte
+                </button>
+                <button 
+                  onClick={() => navigate('/login-company')}
+                  className="bg-white hover:bg-gray-50 text-gray-700 font-bold py-3 px-8 rounded-lg border border-gray-300 transition-colors"
+                >
+                  Se connecter
+                </button>
+              </div>
             </div>
           </div>
         </div>

@@ -61,72 +61,73 @@ const CompanyRegistrationForm = () => {
   };
 
   // Submit form
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setErrors({});
-    setSuccessMsg("");
+  // Submit form
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  setErrors({});
+  setSuccessMsg("");
 
-    const newErrors = validateForm();
-    if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors);
-      return;
-    }
+  const newErrors = validateForm();
+  if (Object.keys(newErrors).length > 0) {
+    setErrors(newErrors);
+    return;
+  }
 
-    try {
-      setLoading(true);
+  try {
+    setLoading(true);
 
-      // Prepare FormData (multipart)
-      const dataToSend = new FormData();
-      Object.keys(formData).forEach((key) => {
-        if (key !== "confirmPassword" && formData[key] !== null && formData[key] !== "") {
-          dataToSend.append(key, formData[key]);
-        }
-      });
-
-      const response = await axios.post("http://localhost:5000/api/companies/register", dataToSend, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
-
-      setSuccessMsg("🎉 Compagnie enregistrée avec succès! Vous pouvez maintenant vous connecter.");
-
-      // Reset form
-      setFormData({
-        companyName: "",
-        companyType: "transport",
-        address: "",
-        city: "",
-        country: "Côte d'Ivoire",
-        phone: "",
-        email: "",
-        password: "",
-        confirmPassword: "",
-        ceoName: "",
-        yearFounded: "",
-        transportLicense: "",
-        logo: null,
-      });
-
-      // Redirection vers la page de connexion après 2 secondes
-      setTimeout(() => {
-        navigate('/login-company');
-      }, 2000);
-
-    } catch (error) {
-      console.error("Registration error:", error);
-      if (error.response) {
-        const msg = error.response.data?.message || "Erreur lors de l'inscription";
-        if (msg.includes("déjà") || msg.includes("déjà utilisé")) {
-          setErrors({ email: "Cet email ou numéro existe déjà", submit: msg });
-        } else {
-          setErrors({ submit: msg });
-        }
-      } else {
-        setErrors({ submit: "Impossible de contacter le serveur. Vérifiez votre connexion." });
+    // Prepare FormData (multipart)
+    const dataToSend = new FormData();
+    Object.keys(formData).forEach((key) => {
+      if (key !== "confirmPassword" && formData[key] !== null && formData[key] !== "") {
+        dataToSend.append(key, formData[key]);
       }
-    } finally {
-      setLoading(false);
+    });
+// Utilisez l'URL relative avec le proxy
+await axios.post("/api/companies/register", dataToSend, {
+  headers: { "Content-Type": "multipart/form-data" },
+});
+
+    setSuccessMsg("🎉 Compagnie enregistrée avec succès! Vous pouvez maintenant vous connecter.");
+
+    // Reset form
+    setFormData({
+      companyName: "",
+      companyType: "transport",
+      address: "",
+      city: "",
+      country: "Côte d'Ivoire",
+      phone: "",
+      email: "",
+      password: "",
+      confirmPassword: "",
+      ceoName: "",
+      yearFounded: "",
+      transportLicense: "",
+      logo: null,
+    });
+
+    setTimeout(() => {
+      navigate('/login-company');
+    }, 2000);
+
+  } catch (error) {
+    console.error("Registration error:", error);
+    if (error.response) {
+      const msg = error.response.data?.message || "Erreur lors de l'inscription";
+      if (msg.includes("déjà") || msg.includes("déjà utilisé")) {
+        setErrors({ email: "Cet email ou numéro existe déjà", submit: msg });
+      } else {
+        setErrors({ submit: msg });
+      }
+    } else {
+      setErrors({ submit: "Impossible de contacter le serveur. Vérifiez votre connexion." });
     }
-  };
+  } finally {
+    setLoading(false);
+  }
+};
+     
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-8 px-4 sm:px-6 lg:px-8">

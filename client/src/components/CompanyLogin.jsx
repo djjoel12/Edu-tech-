@@ -24,7 +24,7 @@ const CompanyLogin = () => {
     setError('');
 
     try {
-      const response = await fetch('http://localhost:5000/api/companies/login', {
+     const response = await fetch('/api/companies/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
