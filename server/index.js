@@ -6,32 +6,32 @@ import dotenv from "dotenv";
 import path from "path";
 import fs from "fs";
 
-// ===== Import des routes =====
-import schoolRoutes from "./routes/schoolRoutes.js";
-import authRoutes from "./routes/authRoutes.js"; // ✅ ajout
+// ===== Import routes mises à jour =====
+import companyRoutes from "./routes/companyRoutes.js";
+
 
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT ?? 5000;
+const PORT = process.env.PORT || 5000;
 
-// ===== Middleware =====
+// ===== Middlewares =====
 app.use(cors({ origin: "*" }));
 app.use(express.json());
 
-// ===== Créer automatiquement le dossier uploads s'il n'existe pas =====
+// ===== Create uploads folder if not exists =====
 const uploadDir = path.join(process.cwd(), "uploads");
 if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir);
 
-// ===== Servir les fichiers statiques (logos) =====
+// ===== Serve static files (logos) =====
 app.use("/uploads", express.static(uploadDir));
 
 // ===== Routes =====
-app.get("/", (req, res) => res.send("SaaS École — API OK 🚀"));
-app.use("/api", schoolRoutes);
-app.use("/api/auth", authRoutes); // ✅ ajout de la route d’authentification
+app.get("/", (req, res) => res.send("🚀 Transport Ticketing API Ready"));
+app.use("/api/companies", companyRoutes);
+//app.use("/api/auth", authRoutes);
 
-// ===== Démarrage serveur + connexion MongoDB =====
+// ===== Database + Server start =====
 async function start() {
   try {
     if (!process.env.MONGODB_URI) {
@@ -45,7 +45,7 @@ async function start() {
     }
 
     app.listen(PORT, "0.0.0.0", () =>
-      console.log(`🚀 Server is running on http://localhost:${PORT}`)
+      console.log(`🚀 Serveur lancé : http://localhost:${PORT}`)
     );
   } catch (err) {
     console.error("❌ Erreur au démarrage :", err);
