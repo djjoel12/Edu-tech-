@@ -1,0 +1,21 @@
+services:
+  - type: web
+    name: chapticket
+    env: node
+    rootDir: .
+    buildCommand: |
+      echo "📦 Installing client dependencies..."
+      cd client && npm install
+      echo "🏗️ Building client..."
+      npm run build
+      echo "📦 Installing server dependencies..."
+      cd ../server && npm install
+    startCommand: cd server && npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3001
+    plans:
+      - name: free
+        type: free
