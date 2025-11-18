@@ -32,7 +32,8 @@ if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir);
 app.use("/uploads", express.static(uploadDir));
 
 // ===== SERVIR LE FRONTEND REACT =====
-app.use(express.static(path.join(__dirname, '../client/build')));
+const clientBuildPath = path.join(__dirname, '../client/build');
+app.use(express.static(clientBuildPath));
 
 // ===== Routes API =====
 app.get("/api/health", (req, res) => {
@@ -44,10 +45,21 @@ app.use("/api/routes", routeRoutes);
 app.use("/api/schedules", scheduleRoutes);
 //app.use("/api/auth", authRoutes);
 
-// ===== TOUTES LES AUTRES ROUTES RENVOIENT VERS REACT (CORRIGÉ) =====
-app.get('*', (req, res) => {
-  // Servir index.html pour le routing React
-  res.sendFile(path.join(__dirname, '../client/build', 'index.html'));
+// ===== ROUTE CATCH-ALL SÉCURISÉE POUR REACT =====
+// Cette approche évite le problème de la route '*'
+app.use((req, res, next) => {
+  // Si c'est une route API, continuer
+  if (req.path.startsWith('/api/')) {
+    return next();
+  }
+  
+  // Si c'est un fichier statique, continuer
+  if (req.path.includes('.')) {
+    return next();
+  }
+  
+  // Pour toutes les autres routes, servir index.html
+  res.sendFile(path.join(clientBuildPath, 'index.html'));
 });
 
 // ===== Database + Server start =====
@@ -62,7 +74,7 @@ async function start() {
 
     app.listen(PORT, "0.0.0.0", () => {
       console.log(`🚀 Serveur lancé sur le port ${PORT}`);
-      console.log(`🌐 Frontend React servi depuis /client/build`);
+      console.log(`🌐 Frontend React servi depuis ${clientBuildPath}`);
     });
   } catch (err) {
     console.error("❌ Erreur au démarrage :", err);
