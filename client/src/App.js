@@ -3,7 +3,7 @@ import React from "react";
 import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 import HomePage from "./components/HomePage";
 import CompanyRegisterForm from "./components/CompanyRegisterForm";
-import CompanyLogin from "./components/CompanyLogin"; // ← IMPORT AJOUTÉ
+import CompanyLogin from "./components/CompanyLogin";
 import CompanyDashboard from './components/CompanyDashboard';
 
 function App() {
@@ -51,7 +51,7 @@ function App() {
           <Route path="/" element={<HomePage />} />
           <Route path="/register-company" element={<CompanyRegisterForm />} />
           <Route path="/login-company" element={<CompanyLogin />} />
-          <Route path="/company-dashboard" element={<CompanyDashboard />} /> {/* ← ROUTE AJOUTÉE */}
+          <Route path="/company-dashboard" element={<CompanyDashboard />} />
           <Route path="/find-ticket" element={
             <div className="container mx-auto p-8 text-center">
               <h2 className="text-2xl font-bold text-gray-900 mb-4">
@@ -62,14 +62,21 @@ function App() {
               </p>
             </div>
           } />
-          <Route path="/company-dashboard" element={
+          {/* Route de fallback pour les pages non trouvées */}
+          <Route path="*" element={
             <div className="container mx-auto p-8 text-center">
               <h2 className="text-2xl font-bold text-gray-900 mb-4">
-                Tableau de bord compagnie - Bientôt disponible
+                Page non trouvée
               </h2>
-              <p className="text-gray-600">
-                Cette fonctionnalité sera bientôt implémentée.
+              <p className="text-gray-600 mb-4">
+                La page que vous recherchez n'existe pas.
               </p>
+              <Link 
+                to="/" 
+                className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2 rounded-lg font-medium"
+              >
+                Retour à l'accueil
+              </Link>
             </div>
           } />
         </Routes>

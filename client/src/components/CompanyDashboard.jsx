@@ -1,10 +1,12 @@
 // src/components/CompanyDashboard.jsx
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import AddRouteForm from './AddRouteForm';
 
 const CompanyDashboard = () => {
   const navigate = useNavigate();
   const [company, setCompany] = useState(null);
+  const [showAddRoute, setShowAddRoute] = useState(false);
 
   useEffect(() => {
     // Vérifier si la compagnie est connectée
@@ -20,6 +22,12 @@ const CompanyDashboard = () => {
   const handleLogout = () => {
     localStorage.removeItem('company');
     navigate('/login-company');
+  };
+
+  const handleRouteAdded = (newRoute) => {
+    console.log('Nouveau trajet ajouté:', newRoute);
+    setShowAddRoute(false);
+    // Ici vous pourrez recharger la liste des trajets plus tard
   };
 
   // Loading state
@@ -86,11 +94,11 @@ const CompanyDashboard = () => {
                 <span className="font-medium">Ajouter vos véhicules</span>
               </div>
               
-              <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
-                <div className="w-8 h-8 bg-gray-400 rounded-full flex items-center justify-center text-white font-bold">
+              <div className="flex items-center space-x-3 p-3 bg-green-50 rounded-lg">
+                <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center text-white font-bold">
                   2
                 </div>
-                <span className="font-medium text-gray-500">Créer vos lignes</span>
+                <span className="font-medium">Créer vos lignes</span>
               </div>
               
               <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
@@ -115,7 +123,10 @@ const CompanyDashboard = () => {
                 </div>
               </button>
               
-              <button className="w-full text-left p-4 border-2 border-dashed border-gray-300 rounded-xl hover:border-green-500 hover:bg-green-50 transition-colors">
+              <button 
+                onClick={() => setShowAddRoute(true)}
+                className="w-full text-left p-4 border-2 border-dashed border-gray-300 rounded-xl hover:border-green-500 hover:bg-green-50 transition-colors"
+              >
                 <div className="flex items-center space-x-3">
                   <span className="text-2xl">🗺️</span>
                   <div>
@@ -150,7 +161,29 @@ const CompanyDashboard = () => {
             </div>
           </div>
         </div>
+
+        {/* Section pour afficher les trajets (à compléter plus tard) */}
+        <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200 mt-6">
+          <h2 className="text-xl font-bold text-gray-900 mb-4">Vos trajets</h2>
+          <div className="text-center py-8 text-gray-500">
+            <p>Créez votre premier trajet pour le voir apparaître ici</p>
+            <button 
+              onClick={() => setShowAddRoute(true)}
+              className="mt-4 bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded-lg font-medium"
+            >
+              Créer mon premier trajet
+            </button>
+          </div>
+        </div>
       </main>
+
+      {/* Modal pour ajouter un trajet */}
+      {showAddRoute && (
+        <AddRouteForm 
+          onClose={() => setShowAddRoute(false)}
+          onRouteAdded={handleRouteAdded}
+        />
+      )}
     </div>
   );
 };

@@ -8,7 +8,8 @@ import fs from "fs";
 
 // ===== Import routes mises à jour =====
 import companyRoutes from "./routes/companyRoutes.js";
-
+import routeRoutes from "./routes/routeRoutes.js";
+import scheduleRoutes from "./routes/scheduleRoutes.js";
 
 dotenv.config();
 
@@ -29,6 +30,8 @@ app.use("/uploads", express.static(uploadDir));
 // ===== Routes =====
 app.get("/", (req, res) => res.send("🚀 Transport Ticketing API Ready"));
 app.use("/api/companies", companyRoutes);
+app.use("/api/routes", routeRoutes);
+app.use("/api/schedules", scheduleRoutes);
 //app.use("/api/auth", authRoutes);
 
 // ===== Database + Server start =====
