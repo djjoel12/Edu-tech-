@@ -32,18 +32,21 @@ if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir);
 app.use("/uploads", express.static(uploadDir));
 
 // ===== SERVIR LE FRONTEND REACT =====
-// Servir les fichiers statiques du frontend buildé
 app.use(express.static(path.join(__dirname, '../client/build')));
 
 // ===== Routes API =====
-app.get("/", (req, res) => res.send("🚀 Transport Ticketing API Ready"));
+app.get("/api/health", (req, res) => {
+  res.json({ status: "OK", message: "ChapTicket API is running" });
+});
+
 app.use("/api/companies", companyRoutes);
 app.use("/api/routes", routeRoutes);
 app.use("/api/schedules", scheduleRoutes);
 //app.use("/api/auth", authRoutes);
 
-// ===== TOUTES LES AUTRES ROUTES RENVOIENT VERS REACT =====
+// ===== TOUTES LES AUTRES ROUTES RENVOIENT VERS REACT (CORRIGÉ) =====
 app.get('*', (req, res) => {
+  // Servir index.html pour le routing React
   res.sendFile(path.join(__dirname, '../client/build', 'index.html'));
 });
 
@@ -53,13 +56,12 @@ async function start() {
     if (!process.env.MONGODB_URI) {
       console.warn("⚠️ MONGODB_URI non défini — démarrage sans DB");
     } else {
-      // Supprimer les options dépréciées pour MongoDB
       await mongoose.connect(process.env.MONGODB_URI);
       console.log("✅ MongoDB connecté");
     }
 
     app.listen(PORT, "0.0.0.0", () => {
-      console.log(`🚀 Serveur lancé : http://localhost:${PORT}`);
+      console.log(`🚀 Serveur lancé sur le port ${PORT}`);
       console.log(`🌐 Frontend React servi depuis /client/build`);
     });
   } catch (err) {
