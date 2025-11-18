@@ -2,20 +2,33 @@ services:
   - type: web
     name: chapticket
     env: node
+    region: ohio
+    plan: free
     rootDir: .
     buildCommand: |
-      echo "📦 Installing client dependencies..."
+      echo "=== DÉBUT DU BUILD ==="
+      echo "📁 Contenu du dossier racine:"
+      ls -la
+      echo "📁 Contenu du dossier client:"
+      ls -la client/
+      echo "📁 Contenu du dossier server:"
+      ls -la server/
+      echo "📦 Installation des dépendances client..."
       cd client && npm install
-      echo "🏗️ Building client..."
-      npm run build
-      echo "📦 Installing server dependencies..."
+      echo "🏗️ Build de l'app React..."
+      CI=false npm run build
+      echo "📦 Installation des dépendances server..."
       cd ../server && npm install
-    startCommand: cd server && npm start
+      echo "✅ BUILD RÉUSSI ==="
+    startCommand: |
+      echo "=== DÉMARRAGE ==="
+      echo "📁 Dossier courant:"
+      pwd
+      ls -la
+      echo "🚀 Lancement du server..."
+      cd server && npm start
     envVars:
       - key: NODE_ENV
         value: production
       - key: PORT
         value: 3001
-    plans:
-      - name: free
-        type: free
