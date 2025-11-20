@@ -31,9 +31,17 @@ if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir);
 // ===== Serve static files (logos) =====
 app.use("/uploads", express.static(uploadDir));
 
-// ===== SERVIR LE FRONTEND REACT =====
-const clientBuildPath = path.join(__dirname, '../client/build');
-app.use(express.static(clientBuildPath));
+// ===== SERVIR LE FRONTEND REACT - CHEMIN CORRIGÉ =====
+const clientBuildPath = path.join(__dirname, '../../client/build');
+console.log("📁 Chemin du build React:", clientBuildPath);
+
+// Vérifier si le build existe
+if (fs.existsSync(clientBuildPath)) {
+  console.log("✅ Build React trouvé");
+  app.use(express.static(clientBuildPath));
+} else {
+  console.warn("⚠️ Build React non trouvé à:", clientBuildPath);
+}
 
 // ===== Routes API =====
 app.get("/api/health", (req, res) => {
@@ -43,10 +51,8 @@ app.get("/api/health", (req, res) => {
 app.use("/api/companies", companyRoutes);
 app.use("/api/routes", routeRoutes);
 app.use("/api/schedules", scheduleRoutes);
-//app.use("/api/auth", authRoutes);
 
 // ===== ROUTE CATCH-ALL SÉCURISÉE POUR REACT =====
-// Cette approche évite le problème de la route '*'
 app.use((req, res, next) => {
   // Si c'est une route API, continuer
   if (req.path.startsWith('/api/')) {
@@ -58,8 +64,15 @@ app.use((req, res, next) => {
     return next();
   }
   
-  // Pour toutes les autres routes, servir index.html
-  res.sendFile(path.join(clientBuildPath, 'index.html'));
+  // Pour toutes les autres routes, servir index.html si le build existe
+  if (fs.existsSync(clientBuildPath)) {
+    res.sendFile(path.join(clientBuildPath, 'index.html'));
+  } else {
+    res.json({ 
+      message: "ChapTicket API is running", 
+      note: "Frontend build not found - run 'npm run build' in client directory" 
+    });
+  }
 });
 
 // ===== Database + Server start =====
@@ -74,7 +87,11 @@ async function start() {
 
     app.listen(PORT, "0.0.0.0", () => {
       console.log(`🚀 Serveur lancé sur le port ${PORT}`);
-      console.log(`🌐 Frontend React servi depuis ${clientBuildPath}`);
+      console.log(`🌐 Frontend React servi depuis: ${clientBuildPath}`);
+      
+      // Log supplémentaire pour debug
+      console.log("📁 Dossier courant:", process.cwd());
+      console.log("📁 Dossier server:", __dirname);
     });
   } catch (err) {
     console.error("❌ Erreur au démarrage :", err);
