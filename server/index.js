@@ -34,7 +34,8 @@ if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir);
 app.use("/uploads", express.static(uploadDir));
 
 // ===== SERVIR LE FRONTEND REACT - CHEMIN CORRIGÉ =====
-const clientBuildPath = path.join(__dirname, '../../client/build');
+const clientBuildPath = path.join(__dirname, "../client/build");
+
 console.log("📁 Chemin du build React:", clientBuildPath);
 
 // Vérifier si le build existe
