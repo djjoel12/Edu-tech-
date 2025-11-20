@@ -1,10 +1,11 @@
-// src/App.js
 import React from "react";
 import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 import HomePage from "./components/HomePage";
 import CompanyRegisterForm from "./components/CompanyRegisterForm";
 import CompanyLogin from "./components/CompanyLogin";
+import RouteComparison from './components/RouteComparison';
 import CompanyDashboard from './components/CompanyDashboard';
+import RoutePage from "./components/RoutePage"; // ← IMPORT AJOUTÉ
 
 function App() {
   return (
@@ -51,6 +52,9 @@ function App() {
           <Route path="/" element={<HomePage />} />
           <Route path="/register-company" element={<CompanyRegisterForm />} />
           <Route path="/login-company" element={<CompanyLogin />} />
+          {/* ROUTE SEO CRITIQUE AJOUTÉE */}
+          <Route path="/trajet/:departure/:arrival" element={<RoutePage />} />
+          <Route path="/comparison/:departure/:arrival" element={<RouteComparison />} />
           <Route path="/company-dashboard" element={<CompanyDashboard />} />
           <Route path="/find-ticket" element={
             <div className="container mx-auto p-8 text-center">

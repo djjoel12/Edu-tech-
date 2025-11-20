@@ -10,6 +10,8 @@ import { fileURLToPath } from 'url';
 import companyRoutes from "./routes/companyRoutes.js";
 import routeRoutes from "./routes/routeRoutes.js";
 import scheduleRoutes from "./routes/scheduleRoutes.js";
+import enhancedRouteRoutes from "./routes/enhancedRouteRoutes.js";
+import geminiRoutes from "./routes/geminiRoutes.js"; // ← NOUVEAU IMPORT
 
 dotenv.config();
 
@@ -45,12 +47,14 @@ if (fs.existsSync(clientBuildPath)) {
 
 // ===== Routes API =====
 app.get("/api/health", (req, res) => {
-  res.json({ status: "OK", message: "ChapTicket API is running" });
+  res.json({ status: "OK", message: "TransportTicket API is running" });
 });
 
 app.use("/api/companies", companyRoutes);
 app.use("/api/routes", routeRoutes);
 app.use("/api/schedules", scheduleRoutes);
+app.use("/api/enhanced-routes", enhancedRouteRoutes);
+app.use("/api/gemini", geminiRoutes); // ← NOUVELLE ROUTE AJOUTÉE
 
 // ===== ROUTE CATCH-ALL SÉCURISÉE POUR REACT =====
 app.use((req, res, next) => {
@@ -85,9 +89,17 @@ async function start() {
       console.log("✅ MongoDB connecté");
     }
 
+    // Vérifier si la clé Gemini est configurée
+    if (process.env.GEMINI_API_KEY) {
+      console.log("🤖 Gemini API: Configurée");
+    } else {
+      console.warn("⚠️ Gemini API: Clé non configurée - GEMINI_API_KEY manquante dans .env");
+    }
+
     app.listen(PORT, "0.0.0.0", () => {
       console.log(`🚀 Serveur lancé sur le port ${PORT}`);
       console.log(`🌐 Frontend React servi depuis: ${clientBuildPath}`);
+      console.log(`🤖 Routes Gemini disponibles: /api/gemini/generate-seo`);
       
       // Log supplémentaire pour debug
       console.log("📁 Dossier courant:", process.cwd());

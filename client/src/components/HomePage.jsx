@@ -13,11 +13,29 @@ const HomePage = () => {
   });
   const [hasSearched, setHasSearched] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [currentBackground, setCurrentBackground] = useState(0);
+
+  // Images de fond pour le carrousel
+  const backgroundImages = [
+    'https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?ixlib=rb-4.0.1&auto=format&fit=crop&w=2000&q=80',
+    'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.1&auto=format&fit=crop&w=2000&q=80',
+    'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?ixlib=rb-4.0.1&auto=format&fit=crop&w=2000&q=80',
+    'https://images.unsplash.com/photo-1473496169904-658ba7c44d8a?ixlib=rb-4.0.1&auto=format&fit=crop&w=2000&q=80'
+  ];
 
   const cities = [
     "Abidjan", "Bouaké", "Daloa", "Korhogo", "San-Pédro", "Yamoussoukro",
     "Divo", "Gagnoa", "Abengourou", "Man", "Anyama", "Bingerville"
   ];
+
+  // Effet pour le carrousel d'images de fond
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentBackground((prev) => (prev + 1) % backgroundImages.length);
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, []);
 
   // Données de démonstration
   const mockRoutes = [
@@ -115,30 +133,7 @@ const HomePage = () => {
       return;
     }
     
-    setError('');
-    setLoading(true);
-    setHasSearched(true);
-    
-    setTimeout(() => {
-      try {
-        const filteredRoutes = allRoutes.filter(route => 
-          route.departureCity === searchData.departureCity && 
-          route.arrivalCity === searchData.arrivalCity
-        );
-        
-        if (filteredRoutes.length === 0) {
-          setError(`❌ Aucun trajet trouvé de ${searchData.departureCity} à ${searchData.arrivalCity}`);
-          setRoutes([]);
-        } else {
-          setRoutes(filteredRoutes);
-        }
-      } catch (error) {
-        setError("❌ Erreur lors de la recherche");
-        setRoutes([]);
-      } finally {
-        setLoading(false);
-      }
-    }, 1000);
+    navigate(`/comparison/${encodeURIComponent(searchData.departureCity)}/${encodeURIComponent(searchData.arrivalCity)}`);
   };
 
   const handleSearchChange = (e) => {
@@ -153,21 +148,6 @@ const HomePage = () => {
     setHasSearched(false);
   };
 
-  const getCompanyInitial = (route) => {
-    return route.companyId?.companyName?.charAt(0) || route.name.charAt(0);
-  };
-
-  const getCompanyName = (route) => {
-    return route.companyId?.companyName || "Compagnie";
-  };
-
-  // Fonction pour calculer le prix total avec frais de service
-  const calculateTotalPrice = (basePrice) => {
-    const serviceFee = 1000;
-    return basePrice + serviceFee;
-  };
-
-  // Fonction pour formater le texte long sur mobile
   const truncateText = (text, maxLength = 20) => {
     return text.length > maxLength ? text.substring(0, maxLength) + "..." : text;
   };
@@ -175,9 +155,6 @@ const HomePage = () => {
   return (
     <div className="min-h-screen bg-slate-50 font-sans text-slate-800 overflow-x-hidden">
       
-      {/* Bandeau tricolore - Toujours visible */}
-      <div className="h-2 w-full bg-gradient-to-r from-orange-500 via-white to-green-600 fixed top-0 z-[100] shadow-lg"></div>
-
       {/* Navigation Responsive */}
       <nav className="fixed top-2 w-full z-[99] bg-black/90 backdrop-blur-lg border-b border-white/10">
         <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6">
@@ -239,15 +216,40 @@ const HomePage = () => {
         )}
       </nav>
 
-      {/* Hero Section - Responsive */}
+      {/* Hero Section avec fond changeant */}
       <div className="relative h-[500px] xs:h-[550px] sm:h-[600px] md:h-[650px] lg:h-[700px] flex items-center justify-center overflow-hidden pt-16">
-        <div className="absolute inset-0 z-0">
-          <img 
-            src="https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?q=80&w=2069&auto=format&fit=crop" 
-            alt="Bus sur route ivoirienne" 
-            className="w-full h-full object-cover"
-          />
-          <div className="absolute inset-0 bg-slate-900/80 bg-gradient-to-b from-slate-900/90 via-slate-900/70 to-slate-900/90"></div>
+        
+        {/* Carrousel d'images de fond */}
+        <div className="fixed inset-0 z-0">
+          {backgroundImages.map((image, index) => (
+            <div
+              key={index}
+              className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
+                index === currentBackground ? 'opacity-100' : 'opacity-0'
+              }`}
+              style={{
+                backgroundImage: `url(${image})`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                backgroundRepeat: 'no-repeat'
+              }}
+            />
+          ))}
+          {/* Overlay amélioré pour une meilleure lisibilité */}
+          <div className="absolute inset-0 bg-black bg-opacity-50"></div>
+        </div>
+
+        {/* Indicateurs de slides */}
+        <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 z-20 flex space-x-2">
+          {backgroundImages.map((_, index) => (
+            <button
+              key={index}
+              className={`w-3 h-3 rounded-full transition-all duration-300 ${
+                index === currentBackground ? 'bg-orange-500 scale-125' : 'bg-white/50'
+              }`}
+              onClick={() => setCurrentBackground(index)}
+            />
+          ))}
         </div>
 
         <div className="relative z-10 max-w-5xl mx-auto px-3 text-center mt-8">
@@ -262,15 +264,15 @@ const HomePage = () => {
             </span>
           </h1>
           
-          <p className="text-lg sm:text-xl md:text-2xl lg:text-2xl text-gray-200 font-bold max-w-3xl mx-auto drop-shadow-lg mb-6 px-4">
+          <p className="text-lg sm:text-xl md:text-2xl lg:text-2xl text-white font-bold max-w-3xl mx-auto drop-shadow-lg mb-6 px-4 leading-relaxed">
             Service de conciergerie indépendant pour réserver vos billets de bus en Côte d'Ivoire
           </p>
           
           <div className="bg-white/20 backdrop-blur-md rounded-xl p-4 border border-white/30 max-w-2xl mx-auto m-4">
-            <p className="text-white font-bold text-sm sm:text-base">
+            <p className="text-white font-bold text-sm sm:text-base drop-shadow-md">
               🚨 <span className="text-orange-300">ATTENTION :</span> Nous ne sommes PAS une compagnie de transport
             </p>
-            <p className="text-white/90 text-xs sm:text-sm mt-1">
+            <p className="text-white/90 text-xs sm:text-sm mt-1 drop-shadow-md">
               Nous sommes un <span className="text-green-300 font-bold">service indépendant</span> qui vous aide à trouver et réserver vos billets
             </p>
           </div>
@@ -288,7 +290,7 @@ const HomePage = () => {
                 <span className="text-lg sm:text-xl lg:text-xl flex-shrink-0 mt-0.5">⚠️</span>
                 <div>
                   <p className="text-base sm:text-lg lg:text-lg">IMPORTANT : SERVICE INDÉPENDANT</p>
-                  <p className="text-xs sm:text-sm lg:text-sm font-normal mt-1 lg:mt-2">
+                  <p className="text-xs sm:text-sm lg:text-sm font-normal mt-1 lg:mt-2 leading-relaxed">
                     TransportTicket.ci est un <span className="font-bold">service de conciergerie indépendant</span> et 
                     n'est <span className="font-bold">PAS affilié</span> aux compagnies de transport. 
                     Les horaires et prix sont <span className="font-bold">indicatifs</span>.
@@ -369,7 +371,7 @@ const HomePage = () => {
                     </div>
                   )}
                 </button>
-                {(searchData.departureCity || hasSearched) && (
+                {(searchData.departureCity || searchData.arrivalCity) && (
                   <button onClick={resetSearch} className="bg-gray-200 text-gray-600 hover:bg-red-100 hover:text-red-600 p-3 lg:p-4 rounded-xl lg:rounded-2xl transition-colors font-bold text-sm shadow-lg flex items-center justify-center">
                     ✕
                   </button>
@@ -380,156 +382,12 @@ const HomePage = () => {
         </div>
       </div>
 
-      {/* Résultats - Responsive */}
-      {hasSearched && (
-        <main className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6 py-12 sm:py-16 lg:py-20">
-          
-          <div className="mb-8 lg:mb-12">
-            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black text-slate-900 text-center">
-              🚍 TRAJETS DISPONIBLES
-            </h2>
-            <div className="h-1.5 w-24 lg:w-32 bg-green-500 mt-3 lg:mt-4 rounded-full mx-auto"></div>
-            
-            {/* Disclaimer Responsive */}
-            <div className="mt-6 lg:mt-8 p-4 lg:p-5 bg-yellow-100 border-2 border-yellow-400 rounded-lg lg:rounded-xl text-yellow-800 text-sm lg:text-base shadow-lg max-w-4xl mx-auto">
-              <div className="flex items-start gap-2 lg:gap-3">
-                <span className="text-lg lg:text-xl flex-shrink-0 mt-0.5">ℹ️</span>
-                <div>
-                  <p className="font-bold text-base lg:text-lg">INFORMATION IMPORTANTE</p>
-                  <p className="text-xs lg:text-sm mt-1 lg:mt-2">
-                    Les horaires affichés sont <span className="font-bold">indicatifs</span>. 
-                    La confirmation définitive sera fournie par notre service concierge avant paiement.
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {loading ? (
-            <div className="grid gap-4 sm:gap-6 lg:gap-8">
-              {[1, 2, 3].map(i => (
-                <div key={i} className="bg-white h-40 sm:h-48 lg:h-56 rounded-xl lg:rounded-2xl shadow-lg animate-pulse bg-gray-200 border-2 border-gray-300"></div>
-              ))}
-            </div>
-          ) : routes.length === 0 ? (
-            <div className="text-center py-12 lg:py-16 bg-white rounded-2xl lg:rounded-3xl border-4 border-dashed border-gray-400 shadow-2xl mx-2 lg:mx-4">
-              <div className="text-6xl lg:text-7xl mb-4 lg:mb-6">😔</div>
-              <h3 className="text-xl sm:text-2xl lg:text-3xl font-black text-gray-900 mb-3 lg:mb-4">AUCUN TRAJET TROUVÉ</h3>
-              <p className="text-base sm:text-lg lg:text-xl text-gray-600 mb-6 lg:mb-8 px-4 lg:px-8">
-                Désolé, nous n'avons trouvé aucun trajet de <span className="font-bold text-orange-600">{truncateText(searchData.departureCity, window.innerWidth < 1024 ? 12 : 15)}</span> à <span className="font-bold text-green-600">{truncateText(searchData.arrivalCity, window.innerWidth < 1024 ? 12 : 15)}</span>
-              </p>
-              <button 
-                onClick={resetSearch}
-                className="bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-bold py-3 lg:py-4 px-6 lg:px-8 rounded-xl lg:rounded-2xl text-base lg:text-lg shadow-2xl transition-all transform hover:scale-105"
-              >
-                🔄 NOUVELLE RECHERCHE
-              </button>
-            </div>
-          ) : (
-            <div className="grid gap-4 sm:gap-6 lg:gap-8">
-              {routes.map((route) => (
-                <div key={route._id} className="group bg-white rounded-2xl lg:rounded-3xl p-4 sm:p-6 lg:p-8 border-2 border-gray-200 shadow-xl hover:shadow-2xl transition-all duration-300 relative overflow-hidden">
-                  
-                  {/* Indicateur latéral */}
-                  <div className={`absolute left-0 top-0 bottom-0 w-2 ${route.routeType === 'vip' ? 'bg-gradient-to-b from-purple-600 to-purple-800' : 'bg-gradient-to-b from-orange-500 to-orange-700'}`}></div>
-
-                  <div className="flex flex-col gap-4 sm:gap-6 lg:gap-8 pl-3 lg:pl-4">
-                    
-                    {/* En-tête Responsive */}
-                    <div className="flex items-start justify-between">
-                      <div className="flex items-center gap-3 sm:gap-4 lg:gap-5 flex-1 min-w-0">
-                        <div className="h-12 w-12 sm:h-14 sm:w-14 lg:h-16 lg:w-16 rounded-xl lg:rounded-2xl bg-gradient-to-br from-slate-800 to-slate-900 text-white flex items-center justify-center text-lg sm:text-xl lg:text-2xl font-black shadow-lg flex-shrink-0">
-                          {getCompanyInitial(route)}
-                        </div>
-                        <div className="min-w-0 flex-1">
-                          <h3 className="text-lg sm:text-xl lg:text-2xl font-black text-slate-900 truncate">{truncateText(getCompanyName(route), window.innerWidth < 1024 ? 20 : 25)}</h3>
-                          <p className="text-sm sm:text-base lg:text-lg text-gray-600 truncate">{route.name}</p>
-                          <div className="flex items-center gap-2 mt-2 lg:mt-3">
-                            <span className="text-xs lg:text-sm text-gray-500 bg-gray-100 px-2 lg:px-3 py-1 rounded font-bold border border-gray-300">
-                              🛡️ INDÉPENDANT
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                      {route.routeType === 'vip' && (
-                        <span className="bg-gradient-to-r from-purple-500 to-purple-600 text-white px-2 lg:px-3 py-1 lg:py-2 rounded-full text-xs lg:text-sm font-black uppercase tracking-wide shadow-lg flex-shrink-0 ml-2">
-                          ⭐ VIP
-                        </span>
-                      )}
-                    </div>
-
-                    {/* Horaires Responsive */}
-                    <div className="bg-gray-100 rounded-xl lg:rounded-2xl p-3 sm:p-4 lg:p-5 border-2 border-gray-300">
-                      <div className="flex items-center justify-between">
-                        <div className="text-center flex-1">
-                          <div className="text-xl sm:text-2xl lg:text-3xl font-black text-slate-900">{route.departureTime}</div>
-                          <div className="text-xs sm:text-sm lg:text-base font-bold text-gray-700 uppercase mt-1 lg:mt-2">{truncateText(route.departureCity, window.innerWidth < 1024 ? 10 : 15)}</div>
-                          <div className="text-xs lg:text-sm text-gray-500 mt-1 lg:mt-2 bg-yellow-100 px-1 lg:px-2 py-0.5 lg:py-1 rounded font-bold">
-                            🕐 Indicatif
-                          </div>
-                        </div>
-                        
-                        <div className="flex-1 px-2 sm:px-4 lg:px-6 flex flex-col items-center">
-                          <div className="text-xs lg:text-sm font-black text-gray-600 mb-2 lg:mb-3 bg-white px-2 lg:px-3 py-1 rounded-full border">
-                            ⏱️ {route.duration}
-                          </div>
-                          <div className="w-full h-1 lg:h-1.5 bg-gray-400 relative flex items-center">
-                            <div className="h-3 w-3 lg:h-4 lg:w-4 bg-orange-500 rounded-full absolute left-0 -ml-1.5 lg:-ml-2 border border-white shadow"></div>
-                            <div className="absolute inset-0 flex items-center justify-center">
-                              <div className="bg-white px-1 py-0.5 lg:px-2 lg:py-1 rounded-full border shadow-sm">
-                                <span className="text-[10px] lg:text-xs font-black text-gray-600">🚌</span>
-                              </div>
-                            </div>
-                            <div className="h-3 w-3 lg:h-4 lg:w-4 bg-green-600 rounded-full absolute right-0 -mr-1.5 lg:-mr-2 border border-white shadow"></div>
-                          </div>
-                        </div>
-
-                        <div className="text-center flex-1">
-                          <div className="text-xl sm:text-2xl lg:text-3xl font-black text-slate-900">{route.arrivalTime}</div>
-                          <div className="text-xs sm:text-sm lg:text-base font-bold text-gray-700 uppercase mt-1 lg:mt-2">{truncateText(route.arrivalCity, window.innerWidth < 1024 ? 10 : 15)}</div>
-                          <div className="text-xs lg:text-sm text-gray-500 mt-1 lg:mt-2 bg-yellow-100 px-1 lg:px-2 py-0.5 lg:py-1 rounded font-bold">
-                            🕐 Estimé
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Prix et Bouton Responsive */}
-                    <div className="flex flex-col lg:flex-row lg:justify-between lg:items-center gap-4 lg:gap-6 border-t-2 border-gray-200 pt-4 lg:pt-6">
-                      <div className="text-left min-w-0 flex-1">
-                        <span className="text-xs lg:text-sm font-black text-gray-500 uppercase block">PRIX ESTIMÉ</span>
-                        <div className="text-2xl sm:text-3xl lg:text-4xl font-black text-orange-600 tracking-tight mt-1 lg:mt-2">
-                          {route.price?.toLocaleString()} <span className="text-sm lg:text-base text-gray-600 font-bold">FCFA</span>
-                        </div>
-                        <div className="text-xs lg:text-sm text-green-600 font-black mt-2 lg:mt-3 bg-green-50 px-2 lg:px-3 py-1 lg:py-1.5 rounded border border-green-200">
-                          ➕ 1 000 FCFA frais
-                        </div>
-                        <div className="text-sm lg:text-base font-black text-slate-900 mt-2 lg:mt-3 bg-blue-50 px-2 lg:px-3 py-1.5 lg:py-2 rounded border border-blue-300">
-                          💰 TOTAL: {calculateTotalPrice(route.price).toLocaleString()} FCFA
-                        </div>
-                      </div>
-                      
-                      <button className="bg-gradient-to-r from-slate-800 to-slate-900 hover:from-green-600 hover:to-green-700 text-white font-black py-3 lg:py-4 px-4 sm:px-6 lg:px-8 rounded-xl lg:rounded-2xl transition-all shadow-xl hover:shadow-green-500/30 text-sm lg:text-base transform hover:scale-105 flex items-center justify-center gap-2 lg:gap-3 flex-shrink-0">
-                        <span className="hidden xs:inline">🎫</span>
-                        <span>RÉSERVER</span>
-                        <span className="text-sm lg:text-base">➡️</span>
-                      </button>
-                    </div>
-
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </main>
-      )}
-
       {/* Section d'accueil Responsive */}
       {!hasSearched && (
         <main className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6 py-12 sm:py-16 lg:py-20">
           <div className="text-center py-12 sm:py-16 lg:py-20 bg-gradient-to-br from-white to-blue-50 rounded-2xl sm:rounded-3xl lg:rounded-3xl border-4 border-orange-200 shadow-2xl mx-2 lg:mx-4">
             <div className="text-6xl sm:text-7xl lg:text-8xl mb-6 lg:mb-8">🚍</div>
-            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black text-slate-900 mb-4 lg:mb-6 px-4 lg:px-8">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black text-slate-900 mb-4 lg:mb-6 px-4 lg:px-8 leading-tight">
               TROUVEZ VOTRE <span className="text-orange-600">PROCHAIN VOYAGE</span>
             </h2>
             <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-gray-700 max-w-3xl lg:max-w-4xl mx-auto mb-8 lg:mb-12 leading-relaxed px-4 lg:px-8">
@@ -541,17 +399,17 @@ const HomePage = () => {
               <div className="text-center p-4 lg:p-6 bg-white rounded-xl lg:rounded-2xl shadow-lg border-2 border-orange-200">
                 <div className="w-12 h-12 sm:w-16 sm:h-16 lg:w-20 lg:h-20 bg-orange-100 rounded-xl lg:rounded-2xl flex items-center justify-center text-xl sm:text-2xl lg:text-3xl mb-3 lg:mb-4 mx-auto">📍</div>
                 <p className="text-sm sm:text-base lg:text-lg font-black text-gray-800">CHOISISSEZ VOS VILLES</p>
-                <p className="text-xs sm:text-sm lg:text-base text-gray-600 mt-1 lg:mt-2">Sélectionnez départ et arrivée</p>
+                <p className="text-xs sm:text-sm lg:text-base text-gray-600 mt-1 lg:mt-2 leading-relaxed">Sélectionnez départ et arrivée</p>
               </div>
               <div className="text-center p-4 lg:p-6 bg-white rounded-xl lg:rounded-2xl shadow-lg border-2 border-green-200">
                 <div className="w-12 h-12 sm:w-16 sm:h-16 lg:w-20 lg:h-20 bg-green-100 rounded-xl lg:rounded-2xl flex items-center justify-center text-xl sm:text-2xl lg:text-3xl mb-3 lg:mb-4 mx-auto">🔍</div>
                 <p className="text-sm sm:text-base lg:text-lg font-black text-gray-800">RECHERCHEZ LES TRAJETS</p>
-                <p className="text-xs sm:text-sm lg:text-base text-gray-600 mt-1 lg:mt-2">Trouvez les meilleures options</p>
+                <p className="text-xs sm:text-sm lg:text-base text-gray-600 mt-1 lg:mt-2 leading-relaxed">Trouvez les meilleures options</p>
               </div>
               <div className="text-center p-4 lg:p-6 bg-white rounded-xl lg:rounded-2xl shadow-lg border-2 border-blue-200">
                 <div className="w-12 h-12 sm:w-16 sm:h-16 lg:w-20 lg:h-20 bg-blue-100 rounded-xl lg:rounded-2xl flex items-center justify-center text-xl sm:text-2xl lg:text-3xl mb-3 lg:mb-4 mx-auto">🎫</div>
                 <p className="text-sm sm:text-base lg:text-lg font-black text-gray-800">RÉSERVEZ FACILEMENT</p>
-                <p className="text-xs sm:text-sm lg:text-base text-gray-600 mt-1 lg:mt-2">Service de réservation simple</p>
+                <p className="text-xs sm:text-sm lg:text-base text-gray-600 mt-1 lg:mt-2 leading-relaxed">Service de réservation simple</p>
               </div>
             </div>
             
@@ -559,7 +417,7 @@ const HomePage = () => {
               <p className="text-sm sm:text-base lg:text-lg font-black text-red-800">
                 🚨 RAPPEL IMPORTANT : SERVICE INDÉPENDANT
               </p>
-              <p className="text-red-700 text-xs sm:text-sm lg:text-base mt-1 lg:mt-2">
+              <p className="text-red-700 text-xs sm:text-sm lg:text-base mt-1 lg:mt-2 leading-relaxed">
                 Nous ne sommes PAS une compagnie de transport. Nous vous aidons à réserver vos billets.
               </p>
             </div>
@@ -582,12 +440,12 @@ const HomePage = () => {
             <div className="max-w-5xl mx-auto mt-6 lg:mt-8 p-4 sm:p-6 lg:p-8 bg-white border-4 border-red-400 rounded-xl sm:rounded-2xl lg:rounded-3xl shadow-2xl mx-2 lg:mx-4">
               <div className="text-center mb-4 lg:mb-6">
                 <span className="text-2xl sm:text-3xl lg:text-4xl">⚠️</span>
-                <h3 className="text-lg sm:text-xl lg:text-2xl font-black text-red-800 mt-1 lg:mt-2">
+                <h3 className="text-lg sm:text-xl lg:text-2xl font-black text-red-800 mt-1 lg:mt-2 leading-tight">
                   AVERTISSEMENT JURIDIQUE
                 </h3>
               </div>
               
-              <div className="text-left space-y-3 lg:space-y-4 text-sm lg:text-base text-gray-800">
+              <div className="text-left space-y-3 lg:space-y-4 text-sm lg:text-base text-gray-800 leading-relaxed">
                 <p className="font-bold text-red-700 text-sm lg:text-base">
                   🚨 TransportTicket.ci est un SERVICE DE CONCIERGERIE INDÉPENDANT
                 </p>
@@ -613,7 +471,7 @@ const HomePage = () => {
               </div>
             </div>
             
-            <p className="text-gray-600 text-sm sm:text-base lg:text-lg mt-6 lg:mt-8 font-bold">
+            <p className="text-gray-600 text-sm sm:text-base lg:text-lg mt-6 lg:mt-8 font-bold leading-relaxed">
               © 2025 TransportTicket.ci - Service de conciergerie indépendant
             </p>
           </div>
@@ -621,6 +479,6 @@ const HomePage = () => {
       </footer>
     </div>
   );
-};
+}; 
 
 export default HomePage;

@@ -4,14 +4,14 @@ import Route from "../models/Route.js";
 
 const router = express.Router();
 
-// GET toutes les routes avec les infos de la compagnie
+// GET toutes les routes avec infos compagnie
 router.get("/", async (req, res) => {
   try {
     console.log("📡 Requête GET /api/routes reçue");
     
     // Récupérer tous les trajets avec les infos de la compagnie
     const routes = await Route.find({})
-      .populate("companyId", "companyName logo email phone") // Peupler seulement les champs nécessaires
+      .populate("companyId", "companyName logo email phone")
       .exec();
     
     console.log(`✅ ${routes.length} trajets trouvés avec infos compagnie`);
@@ -23,13 +23,36 @@ router.get("/", async (req, res) => {
   }
 });
 
-// ... le reste de votre code reste inchangé
+// GET routes par ville (pour la recherche)
+router.get("/search/:departure/:arrival", async (req, res) => {
+  try {
+    const { departure, arrival } = req.params;
+    
+    console.log(`🔍 Recherche trajets: ${departure} → ${arrival}`);
+    
+    const routes = await Route.find({
+      departureCity: new RegExp(departure, 'i'),
+      arrivalCity: new RegExp(arrival, 'i'),
+      status: "active"
+    })
+    .populate("companyId", "companyName logo email phone")
+    .sort({ departureTime: 1 });
+    
+    console.log(`✅ ${routes.length} trajets trouvés pour ${departure} → ${arrival}`);
+    
+    res.json(routes);
+  } catch (err) {
+    console.error("❌ Error searching routes:", err);
+    res.status(500).json({ message: "Erreur serveur" });
+  }
+});
 
 // GET routes par compagnie
 router.get("/company/:companyId", async (req, res) => {
   try {
     const { companyId } = req.params;
-    const routes = await Route.find({ companyId });
+    const routes = await Route.find({ companyId })
+      .populate("companyId", "companyName logo email phone");
     res.json(routes);
   } catch (err) {
     console.error("Error fetching company routes:", err);
